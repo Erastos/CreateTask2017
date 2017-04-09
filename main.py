@@ -14,12 +14,13 @@ articles_url = 'https://newsapi.org/v1/articles'
 # Boolean Flag that checks to see if the user called the getsources function
 sources_called = False
 
-# Function intiates and creates the command line interface
+
+# Function initiates and creates the command line interface
 def initiate_cmd():
-    # Desctiption for the command line progam
-    desciption = \
-                'Takes in strings and outputs the language and the confidence'
-    parser = argparse.ArgumentParser(description=desciption)
+    # Description for the command line program
+    description = \
+        'Takes in strings and outputs the language and the confidence'
+    parser = argparse.ArgumentParser(description=description)
     # -a is the argument that outputs articles
     parser.add_argument('-a', help='Outputs the top stories from input source')
     # -s is the argument that outputs the sources
@@ -31,15 +32,15 @@ def initiate_cmd():
     mode_manager(arguments)
 
 
-def getArticles(source_name):
-    # Gets a dictionary containging the sources and their ids
+def get_articles(source_name):
+    # Gets a dictionary containing the sources and their ids
     names = getsources()
     # Loads the specific source id that the user passes to the program
     source_id = names[source_name]
     # Creates the parameters that will be passed to the api
-    parems = {'source': source_id, 'apiKey': api_key}
+    params = {'source': source_id, 'apiKey': api_key}
     # Gets the api's response with the parameters created above
-    r = requests.get(articles_url, params=parems)
+    r = requests.get(articles_url, params=params)
     # Decodes the JSON response of the api
     decoded_json = json.loads(r.content)
     # Pulls the title and the url from the response
@@ -78,6 +79,7 @@ def getsources():
     # Return the dictionary
     return id_name_dictionary
 
+
 # Function that handles the control flow of the program
 def mode_manager(arguments):
     for argument in arguments.items():
@@ -85,7 +87,7 @@ def mode_manager(arguments):
         for index, key in enumerate(argument):
             if key == 'a':
                 if argument[index + 1] is not None:
-                    getArticles(argument[index + 1])
+                    get_articles(argument[index + 1])
             elif key == 's':
                 if argument[index + 1]:
                     global sources_called

@@ -13,7 +13,7 @@ sources_url = 'https://newsapi.org/v1/sources'
 articles_url = 'https://newsapi.org/v1/articles'
 # Boolean Flag that checks to see if the user called the getsources function
 sources_called = False
-
+articles_only = True
 
 # Function initiates and creates the command line interface
 def initiate_cmd():
@@ -26,6 +26,7 @@ def initiate_cmd():
     # -s is the argument that outputs the sources
     parser.add_argument('-s', help='Outputs the source used by News API',
                         action='store_true')
+    parser.add_argument('-n', help='Outputs the content of the article that is referenced by an article number')
     # imports arguments that the user passes to the program
     arguments = vars(parser.parse_args())
     # Calls the flag management function
@@ -47,8 +48,10 @@ def get_articles(source_name):
     list_of_stories = [[article['title'], article['url']]
                        for article in decoded_json['articles']]
     # Prints the title and the url to the screen
-    for i in list_of_stories:
-        print("Title: %s\n Url: %s\n\n\n" % (i[0], i[1]))
+    if articles_only:
+        for i in list_of_stories:
+            print("Title: %s\n Url: %s\n\n\n" % (i[0], i[1]))
+    return decoded_json['articles']
 
 
 # Function that pulls the sources that the API supports
@@ -79,6 +82,12 @@ def getsources():
     # Return the dictionary
     return id_name_dictionary
 
+def get_article_content(article_number):
+    article_list = get_articles()
+    print(article_list)
+
+
+
 
 # Function that handles the control flow of the program
 def mode_manager(arguments):
@@ -93,6 +102,11 @@ def mode_manager(arguments):
                     global sources_called
                     sources_called = True
                     getsources()
+            elif key == 'n':
+                if argument[index] and arguments['a'][1]:
+                        global articles_only
+                        articles_only = False
+                        get_article_content(argument['n'])
 
 
 # Starts the command line interface

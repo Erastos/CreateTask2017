@@ -5,6 +5,9 @@ import requests
 # Module used for decoding json
 import json
 
+from PyQt5.QtWidgets import QApplication, QWidget, QLineEdit, QPushButton, QCheckBox, QGridLayout, QLabel, QTextEdit
+import sys
+
 # API Key used for the News API
 api_key = '7d0ef28a2b7e498285a136b363639d31'
 # URL used for pulling the sources that News API
@@ -73,7 +76,7 @@ def getsources():
     list_of_ids = [source['id'] for source in decoded_json['sources']]
     # Create an empty dicitonary
     id_name_dictionary = {}
-    # Loop through the source names and ids and put them in a dicitonary
+    # Loop through the source names and ids and put them in a dictionary
     for a, b in zip(list_of_names, list_of_ids):
         id_name_dictionary[a] = b
     # Return the dictionary
@@ -96,4 +99,37 @@ def mode_manager(arguments):
 
 
 # Starts the command line interface
-initiate_cmd()
+# initiate_cmd()
+
+
+class app(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+
+    def initUI(self):
+        title = 'News API Interface'
+        grid = QGridLayout()
+        self.setLayout(grid)
+
+        article_txtbox = QLineEdit()
+        source_chkbox = QCheckBox()
+        submit_btn = QPushButton('Submit')
+        output = QTextEdit()
+
+        article_label = QLabel('Source Name:')
+        source_label = QLabel('Display Sources?')
+
+        grid.addWidget(article_txtbox, 0, 1)
+        grid.addWidget(source_chkbox, 2, 1)
+        grid.addWidget(submit_btn, 3, 2)
+        grid.addWidget(article_label, 0, 0)
+        grid.addWidget(source_label, 2, 0)
+        grid.addWidget(output, 0, 2)
+        self.setWindowTitle(title)
+        self.show()
+
+
+root = QApplication(sys.argv)
+app = app()
+sys.exit(root.exec_())

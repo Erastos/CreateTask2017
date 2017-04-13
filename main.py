@@ -5,7 +5,7 @@ import requests
 # Module used for decoding json
 import json
 
-from PyQt5.QtWidgets import QApplication, QWidget, QLineEdit, QPushButton, QCheckBox, QGridLayout, QLabel, QTextEdit
+from PyQt5 import QtWidgets
 import sys
 
 # API Key used for the News API
@@ -17,6 +17,7 @@ articles_url = 'https://newsapi.org/v1/articles'
 # Boolean Flag that checks to see if the user called the getsources function
 sources_called = False
 articles_only = True
+
 
 # Function initiates and creates the command line interface
 def initiate_cmd():
@@ -38,7 +39,7 @@ def initiate_cmd():
 
 def get_articles(source_name):
     # Gets a dictionary containing the sources and their ids
-    names = getsources()
+    names = getsources()[0]
     # Loads the specific source id that the user passes to the program
     source_id = names[source_name]
     # Creates the parameters that will be passed to the api
@@ -51,10 +52,7 @@ def get_articles(source_name):
     list_of_stories = [[article['title'], article['url']]
                        for article in decoded_json['articles']]
     # Prints the title and the url to the screen
-    if articles_only:
-        for i in list_of_stories:
-            print("Title: %s\n Url: %s\n\n\n" % (i[0], i[1]))
-    return decoded_json['articles']
+    return list_of_stories
 
 
 # Function that pulls the sources that the API supports
@@ -83,13 +81,12 @@ def getsources():
     for a, b in zip(list_of_names, list_of_ids):
         id_name_dictionary[a] = b
     # Return the dictionary
-    return id_name_dictionary
+    return id_name_dictionary, list_of_names
+
 
 def get_article_content(article_number):
     article_list = get_articles()
     print(article_list)
-
-
 
 
 # Function that handles the control flow of the program
@@ -105,45 +102,75 @@ def mode_manager(arguments):
                     global sources_called
                     sources_called = True
                     getsources()
-            elif key == 'n':
-                if argument[index] and arguments['a'][1]:
-                        global articles_only
-                        articles_only = False
-                        get_article_content(argument['n'])
 
 
 # Starts the command line interface
 # initiate_cmd()
 
 
-class app(QWidget):
+class app(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         self.initUI()
 
     def initUI(self):
         title = 'News API Interface'
-        grid = QGridLayout()
+        grid = QtWidgets.QGridLayout()
         self.setLayout(grid)
+        self.resize(700, 500)
 
-        article_txtbox = QLineEdit()
-        source_chkbox = QCheckBox()
-        submit_btn = QPushButton('Submit')
-        output = QTextEdit()
+        self.article_txtbox = QtWidgets.QLineEdit()
+        self.source_chkbox = QtWidgets.QCheckBox()
+        self.submit_btn = QtWidgets.QPushButton('Submit')
+        self.output = QtWidgets.QTextEdit()
+        self.output.resize(300, 300)
 
-        article_label = QLabel('Source Name:')
-        source_label = QLabel('Display Sources?')
+        self.article_label = QtWidgets.QLabel('Source Name:')
+        self.source_label = QtWidgets.QLabel('Display Sources?')
 
-        grid.addWidget(article_txtbox, 0, 1)
-        grid.addWidget(source_chkbox, 2, 1)
-        grid.addWidget(submit_btn, 3, 2)
-        grid.addWidget(article_label, 0, 0)
-        grid.addWidget(source_label, 2, 0)
-        grid.addWidget(output, 0, 2)
+        grid.addWidget(self.article_txtbox, 0, 1)
+        grid.addWidget(self.source_chkbox, 2, 1)
+        grid.addWidget(self.submit_btn, 3, 2)
+        grid.addWidget(self.article_label, 0, 0)
+        grid.addWidget(self.source_label, 2, 0)
+        grid.addWidget(self.output, 0, 2)
+        grid.setRowStretch(2, 3)
         self.setWindowTitle(title)
+
+        self.submit_btn.clicked.connect(self.submit)
+
         self.show()
 
+    def submit(self):
+        source = self.article_txtbox.text()
+        disp_source = self.source_chkbox.isChecked()
+        if disp_source:
+            sources = getsources()
+            self.print_to_textbx(sources)
 
-root = QApplication(sys.argv)
+        elif source:
+            articles = get_articles(source)
+            self.print_to_textbx(articles)
+
+
+    def print_to_textbx(self, text):
+        if type(text) == type(tuple()):
+            string = ''
+            for i in text[1]:
+                string += (i + '\n')
+            self.output.setText(string)
+        else:
+            string = ''
+            for i in text:
+                string += ('Title:' + i[0] + '\n\n' + 'URL:' + i[1] + '\n\n')
+            self.output.setText(string)
+
+
+
+
+
+
+
+root = QtWidgets.QApplication(sys.argv)
 app = app()
 sys.exit(root.exec_())

@@ -1,10 +1,10 @@
-# Module implements the command line interface
-import argparse
-# Module used for interacting with API
-import requests
 # Module used for decoding json
 import json
 
+# Module used for interacting with API
+import requests
+
+# Modules used for GUI implementation
 from PyQt5 import QtWidgets
 import sys
 
@@ -16,25 +16,6 @@ sources_url = 'https://newsapi.org/v1/sources'
 articles_url = 'https://newsapi.org/v1/articles'
 # Boolean Flag that checks to see if the user called the getsources function
 sources_called = False
-articles_only = True
-
-
-# Function initiates and creates the command line interface
-def initiate_cmd():
-    # Description for the command line program
-    description = \
-        'Takes in strings and outputs the language and the confidence'
-    parser = argparse.ArgumentParser(description=description)
-    # -a is the argument that outputs articles
-    parser.add_argument('-a', help='Outputs the top stories from input source')
-    # -s is the argument that outputs the sources
-    parser.add_argument('-s', help='Outputs the source used by News API',
-                        action='store_true')
-    parser.add_argument('-n', help='Outputs the content of the article that is referenced by an article number')
-    # imports arguments that the user passes to the program
-    arguments = vars(parser.parse_args())
-    # Calls the flag management function
-    mode_manager(arguments)
 
 
 def get_articles(source_name):
@@ -84,31 +65,7 @@ def getsources():
     return id_name_dictionary, list_of_names
 
 
-def get_article_content(article_number):
-    article_list = get_articles()
-    print(article_list)
-
-
-# Function that handles the control flow of the program
-def mode_manager(arguments):
-    for argument in arguments.items():
-        # Checks to see if the key is a or s, and then calls the right function
-        for index, key in enumerate(argument):
-            if key == 'a':
-                if argument[index + 1] is not None:
-                    get_articles(argument[index + 1])
-            elif key == 's':
-                if argument[index + 1]:
-                    global sources_called
-                    sources_called = True
-                    getsources()
-
-
-# Starts the command line interface
-# initiate_cmd()
-
-
-class app(QtWidgets.QWidget):
+class App(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         self.initUI()
@@ -152,7 +109,6 @@ class app(QtWidgets.QWidget):
             articles = get_articles(source)
             self.print_to_textbx(articles)
 
-
     def print_to_textbx(self, text):
         if type(text) == type(tuple()):
             string = ''
@@ -166,11 +122,6 @@ class app(QtWidgets.QWidget):
             self.output.setText(string)
 
 
-
-
-
-
-
 root = QtWidgets.QApplication(sys.argv)
-app = app()
+app = App()
 sys.exit(root.exec_())
